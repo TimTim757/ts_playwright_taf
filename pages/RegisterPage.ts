@@ -31,7 +31,7 @@ export class RegisterPage {
         this.passwordInput = page.locator('#customer\\.password');
         this.repeatedPasswordInput = page.locator('#repeatedPassword');
         this.registerButton = page.getByRole('button', { name: 'Register' });
-        this.userAlreadyExistsErrorMessage = page.locator('#placeholder');
+        this.userAlreadyExistsErrorMessage = page.locator('customer\\.username\\.errors');
     }
 
     async goto() {
