@@ -1,27 +1,14 @@
 import { Locator, Page, expect } from '@playwright/test';
 
-// await page.getByRole('link', { name: 'Transfer Funds' }).click();
-// // await page.locator('#amount').click();
-// await page.locator('#amount').fill('10');
-// await page.locator('#fromAccountId').selectOption('23889');
-// await page.getByRole('button', { name: 'Transfer' }).click();
-// await page.getByRole('heading', { name: 'Transfer Complete!' }).click();
-// await expect(page.locator('#showResult')).toContainText('Transfer Complete!');
-// await expect(page.locator('#showResult')).toContainText('$10.00 has been transferred from account');
- 
-
-
-export class TrunsferFundsPage {
+export class TransferFundsPage {
     readonly page: Page;
-
-   readonly transferFundsLink: Locator;
-   readonly amountInput: Locator;
-   readonly fromAccountIdSelect: Locator;
-   readonly toAccountIdSelect: Locator;
-   readonly transferButton: Locator;
-   readonly transferCompleteHeading: Locator;
-   readonly successMessage: Locator;
-//    readonly transferMessage: Locator;
+    readonly transferFundsLink: Locator;
+    readonly amountInput: Locator;
+    readonly fromAccountIdSelect: Locator;
+    readonly toAccountIdSelect: Locator;
+    readonly transferButton: Locator;
+    readonly transferCompleteHeading: Locator;
+    readonly successMessage: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -32,11 +19,9 @@ export class TrunsferFundsPage {
         this.transferButton = page.getByRole('button', { name: 'Transfer' });
         this.transferCompleteHeading = page.getByRole('heading', { name: 'Transfer Complete!' });
         this.successMessage = page.getByText(/has been transferred from account/);
-        // this.transferMessage = page.locator('#showResult');
-   
     }
 
-    async goto() {
+    async openTransferFunds() {
         await this.page.waitForLoadState('networkidle');
         await this.transferFundsLink.click();
     }
@@ -46,17 +31,18 @@ export class TrunsferFundsPage {
     }
 
     async selectFromAccount(fromAccount: string) {
-        await this.fromAccountIdSelect.waitFor({state: 'visible'});
+        await this.fromAccountIdSelect.waitFor({ state: 'visible' });
         await this.fromAccountIdSelect.selectOption(fromAccount);
-    }   
+    }
 
-    // async selectToAccount(toAccount: string) {
-    //     await this.toAccountIdSelect.selectOption(toAccount);
-    // }
+    async selectToAccount(toAccount: string) {
+        await this.toAccountIdSelect.selectOption(toAccount);
+    }
 
     async submitForm() {
         await this.transferButton.click();
     }
+
     async verifyTransferComplete() {
         await expect(this.transferCompleteHeading).toBeVisible();
         await expect(this.successMessage).toBeVisible();
@@ -65,5 +51,4 @@ export class TrunsferFundsPage {
     async verifyTransferMessage(message: string) {
         await expect(this.successMessage).toContainText(message);
     }
-
 }
