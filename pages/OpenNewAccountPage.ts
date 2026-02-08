@@ -1,8 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
+import { BasePage } from './BasePage';
 
-export class OpenNewAccountPage {
-    readonly page: Page;
-
+export class OpenNewAccountPage extends BasePage {
     readonly openNewAccountLink: Locator;
     readonly accountTypeSelect: Locator;
     readonly openAccountButton: Locator;
@@ -12,7 +11,7 @@ export class OpenNewAccountPage {
     readonly newAccountMessage: Locator;
 
     constructor(page: Page) {
-        this.page = page;
+        super(page);
         this.openNewAccountLink = page.getByRole('link', { name: 'Open New Account' });
         this.accountTypeSelect = page.locator('#type');
         this.openAccountButton = page.locator('input.button[value="Open New Account"]');
@@ -46,4 +45,4 @@ export class OpenNewAccountPage {
         await expect(this.newAccountMessage).toBeVisible();
         await expect(this.newAccountMessage).toContainText(newAccountNumber);
     }
-}   
+}
