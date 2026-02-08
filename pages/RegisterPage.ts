@@ -16,6 +16,8 @@ export class RegisterPage {
     readonly repeatedPasswordInput: Locator;
     readonly registerButton: Locator;
     readonly userAlreadyExistsErrorMessage: Locator;
+    readonly welcomeHeading: Locator;
+    readonly successPanel: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -31,15 +33,18 @@ export class RegisterPage {
         this.passwordInput = page.locator('#customer\\.password');
         this.repeatedPasswordInput = page.locator('#repeatedPassword');
         this.registerButton = page.getByRole('button', { name: 'Register' });
-        this.userAlreadyExistsErrorMessage = page.locator('customer\\.username\\.errors');
+        this.userAlreadyExistsErrorMessage = page.locator('#customer\\.username\\.errors');
+        this.welcomeHeading = page.locator('h1');
+        this.successPanel = page.locator('#rightPanel');
     }
 
     async goto() {
-        await this.page.goto('https://parabank.parasoft.com/parabank/register.htm');
+        await this.page.goto('register.htm');
     }
 
     async fillForm() {
         await this.page.waitForLoadState('networkidle');
+        await this.firstNameInput.waitFor({ state: 'visible' });
         await this.firstNameInput.fill(faker.person.firstName());
         await this.lastNameInput.fill(faker.person.lastName());
         await this.addressStreetInput.fill(faker.location.streetAddress());
@@ -48,7 +53,6 @@ export class RegisterPage {
         await this.addressZipCodeInput.fill(faker.location.zipCode());
         await this.phoneNumberInput.fill(faker.phone.number());
         await this.ssnInput.fill(faker.string.numeric(9));
-      
     }
 
     async fillCredentials(username: string, password: string) {
@@ -66,8 +70,8 @@ export class RegisterPage {
     }
 
     async verifySuccessMessage() {
-        await expect(this.page.locator('h1')).toContainText('Welcome');
-        await expect(this.page.locator('#rightPanel')).toContainText('Your account was created successfully. You are now logged in.');
+        await expect(this.welcomeHeading).toContainText('Welcome');
+        await expect(this.successPanel).toContainText('Your account was created successfully. You are now logged in.');
     }
 
 }

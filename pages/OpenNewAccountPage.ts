@@ -13,14 +13,15 @@ export class OpenNewAccountPage {
 
     constructor(page: Page) {
         this.page = page;
-        this.accountTypeSelect = page.locator('#type');
         this.openNewAccountLink = page.getByRole('link', { name: 'Open New Account' });
+        this.accountTypeSelect = page.locator('#type');
         this.openAccountButton = page.locator('input.button[value="Open New Account"]');
         this.newAccountNumber = page.locator('#newAccountId');
         this.accountOpenedHeading = page.getByRole('heading', { name: 'Account Opened!' });
         this.successMessage = page.getByText('Your new account number');
         this.newAccountMessage = page.locator('#openAccountResult');
     }
+
     async goto() {
         await this.openNewAccountLink.click();
     }
@@ -33,15 +34,16 @@ export class OpenNewAccountPage {
         await this.openAccountButton.click();
     }
 
-  async getNewAccountNumber() {
-    await this.newAccountNumber.waitFor({state: 'visible'});
-    return await this.newAccountNumber.textContent();
-  }
+    async getNewAccountNumber(): Promise<string> {
+        await this.newAccountNumber.waitFor({ state: 'visible' });
+        const text = await this.newAccountNumber.textContent();
+        return (text ?? '').trim();
+    }
 
-  async verifyAccountOpened(newAccountNumber: string) {
-    await expect(this.accountOpenedHeading).toBeVisible();
-    await expect(this.successMessage).toBeVisible();
-    await expect(this.newAccountMessage).toBeVisible();
-    await expect(this.newAccountMessage).toContainText(newAccountNumber);
-  }
+    async verifyAccountOpened(newAccountNumber: string) {
+        await expect(this.accountOpenedHeading).toBeVisible();
+        await expect(this.successMessage).toBeVisible();
+        await expect(this.newAccountMessage).toBeVisible();
+        await expect(this.newAccountMessage).toContainText(newAccountNumber);
+    }
 }   
