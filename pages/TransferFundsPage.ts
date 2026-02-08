@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
+import { BasePage } from './BasePage';
 
-export class TransferFundsPage {
-    readonly page: Page;
+export class TransferFundsPage extends BasePage {
     readonly transferFundsLink: Locator;
     readonly amountInput: Locator;
     readonly fromAccountIdSelect: Locator;
@@ -11,7 +11,7 @@ export class TransferFundsPage {
     readonly successMessage: Locator;
 
     constructor(page: Page) {
-        this.page = page;
+        super(page);
         this.transferFundsLink = page.locator('#leftPanel').getByRole('link', { name: 'Transfer Funds' });
         this.amountInput = page.locator('#amount');
         this.fromAccountIdSelect = page.locator('#fromAccountId');

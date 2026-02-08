@@ -1,8 +1,8 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { faker } from '@faker-js/faker';
+import { BasePage } from './BasePage';
 
-export class RegisterPage {
-    readonly page: Page;
+export class RegisterPage extends BasePage {
     readonly firstNameInput: Locator;
     readonly lastNameInput: Locator;
     readonly addressStreetInput: Locator;
@@ -20,7 +20,7 @@ export class RegisterPage {
     readonly successPanel: Locator;
 
     constructor(page: Page) {
-        this.page = page;
+        super(page);
         this.firstNameInput = page.locator('#customer\\.firstName');
         this.lastNameInput = page.locator('#customer\\.lastName');
         this.addressStreetInput = page.locator('#customer\\.address\\.street');
@@ -39,7 +39,7 @@ export class RegisterPage {
     }
 
     async goto() {
-        await this.page.goto('register.htm');
+        await super.goto('register.htm');
     }
 
     async fillForm() {
