@@ -106,7 +106,15 @@ export abstract class BasePage {
         return locator.isVisible();
     }
 
-    protected async waitForNetworkIdle() {
+    async waitForNetworkIdle() {
         await this.page.waitForLoadState('networkidle');
+    }
+
+    async navigateTo(path: string) {
+        await this.page.goto(path);
+    }
+
+    async closePage() {
+        await this.page.close();
     }
 }
