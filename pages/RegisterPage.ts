@@ -1,77 +1,55 @@
-import { Locator, Page, expect } from '@playwright/test';
-import { faker } from '@faker-js/faker';
 import { BasePage } from './BasePage';
+import { createRegisterLocators } from './locators/registerLocators';
+import { Routes, Messages } from '../support/constants';
+
+export type RegisterFormData = {
+    firstName: string;
+    lastName: string;
+    addressStreet: string;
+    addressCity: string;
+    addressState: string;
+    addressZipCode: string;
+    phoneNumber: string;
+    ssn: string;
+};
 
 export class RegisterPage extends BasePage {
-    readonly firstNameInput: Locator;
-    readonly lastNameInput: Locator;
-    readonly addressStreetInput: Locator;
-    readonly addressCityInput: Locator;
-    readonly addressStateInput: Locator;
-    readonly addressZipCodeInput: Locator;
-    readonly phoneNumberInput: Locator;
-    readonly ssnInput: Locator;
-    readonly usernameInput: Locator;
-    readonly passwordInput: Locator;
-    readonly repeatedPasswordInput: Locator;
-    readonly registerButton: Locator;
-    readonly userAlreadyExistsErrorMessage: Locator;
-    readonly welcomeHeading: Locator;
-    readonly successPanel: Locator;
-
-    constructor(page: Page) {
-        super(page);
-        this.firstNameInput = page.locator('#customer\\.firstName');
-        this.lastNameInput = page.locator('#customer\\.lastName');
-        this.addressStreetInput = page.locator('#customer\\.address\\.street');
-        this.addressCityInput = page.locator('#customer\\.address\\.city');
-        this.addressStateInput = page.locator('#customer\\.address\\.state');
-        this.addressZipCodeInput = page.locator('#customer\\.address\\.zipCode');
-        this.phoneNumberInput = page.locator('#customer\\.phoneNumber');
-        this.ssnInput = page.locator('#customer\\.ssn');
-        this.usernameInput = page.locator('#customer\\.username');
-        this.passwordInput = page.locator('#customer\\.password');
-        this.repeatedPasswordInput = page.locator('#repeatedPassword');
-        this.registerButton = page.getByRole('button', { name: 'Register' });
-        this.userAlreadyExistsErrorMessage = page.locator('#customer\\.username\\.errors');
-        this.welcomeHeading = page.locator('h1');
-        this.successPanel = page.locator('#rightPanel');
-    }
+    protected readonly pageName = 'RegisterPage';
+    private readonly locators = createRegisterLocators(this.page);
 
     async goto() {
-        await super.goto('register.htm');
+        await super.goto(Routes.REGISTER);
     }
 
-    async fillForm() {
-        await this.page.waitForLoadState('networkidle');
-        await this.firstNameInput.waitFor({ state: 'visible' });
-        await this.firstNameInput.fill(faker.person.firstName());
-        await this.lastNameInput.fill(faker.person.lastName());
-        await this.addressStreetInput.fill(faker.location.streetAddress());
-        await this.addressCityInput.fill(faker.location.city());
-        await this.addressStateInput.fill(faker.location.state());
-        await this.addressZipCodeInput.fill(faker.location.zipCode());
-        await this.phoneNumberInput.fill(faker.phone.number());
-        await this.ssnInput.fill(faker.string.numeric(9));
+    async fillForm(data: RegisterFormData) {
+        await this.waitForNetworkIdle();
+        await this.waitForVisible(this.locators.firstNameInput);
+        await this.fill(this.locators.firstNameInput, data.firstName);
+        await this.fill(this.locators.lastNameInput, data.lastName);
+        await this.fill(this.locators.addressStreetInput, data.addressStreet);
+        await this.fill(this.locators.addressCityInput, data.addressCity);
+        await this.fill(this.locators.addressStateInput, data.addressState);
+        await this.fill(this.locators.addressZipCodeInput, data.addressZipCode);
+        await this.fill(this.locators.phoneNumberInput, data.phoneNumber);
+        await this.fill(this.locators.ssnInput, data.ssn);
     }
 
     async fillCredentials(username: string, password: string) {
-        await this.usernameInput.fill(username);
-        await this.passwordInput.fill(password);
-        await this.repeatedPasswordInput.fill(password);
+        await this.fill(this.locators.usernameInput, username);
+        await this.fill(this.locators.passwordInput, password);
+        await this.fill(this.locators.repeatedPasswordInput, password);
     }
 
     async submitForm() {
-        await this.registerButton.click();
+        await this.click(this.locators.registerButton);
     }
 
-    async verifyUserAlreadyExistsErrorMessage() {
-       return await this.userAlreadyExistsErrorMessage.isVisible();
+    async verifyUserAlreadyExistsErrorMessage(): Promise<boolean> {
+        return this.isVisible(this.locators.userAlreadyExistsErrorMessage);
     }
 
     async verifySuccessMessage() {
-        await expect(this.welcomeHeading).toContainText('Welcome');
-        await expect(this.successPanel).toContainText('Your account was created successfully. You are now logged in.');
+        await this.expectToContainText(this.locators.welcomeHeading, 'Welcome');
+        await this.expectToContainText(this.locators.successPanel, Messages.REGISTRATION_SUCCESS);
     }
-
 }

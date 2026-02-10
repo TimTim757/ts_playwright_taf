@@ -2,8 +2,9 @@ import { test } from '../support/fixtures';
 import { faker } from '@faker-js/faker';
 import path from 'path';
 import fs from 'fs';
+import { Auth, FormConstraints } from '../support/constants';
 
-const AUTH_FILE = path.join(process.cwd(), 'playwright/.auth/user.json');
+const AUTH_FILE = path.join(process.cwd(), Auth.AUTH_FILE);
 
 test.describe('Auth', () => {
   test.beforeEach(async () => {
@@ -14,14 +15,23 @@ test.describe('Auth', () => {
   });
 
   test('Register a new user', async ({ page, registerPage }) => {
-    const MAX_RETRIES = 3;
     const password = faker.internet.password();
+    const formData = {
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      addressStreet: faker.location.streetAddress(),
+      addressCity: faker.location.city(),
+      addressState: faker.location.state(),
+      addressZipCode: faker.location.zipCode(),
+      phoneNumber: faker.phone.number(),
+      ssn: faker.string.numeric(FormConstraints.SSN_LENGTH),
+    };
 
     await registerPage.goto();
-    for (let i = 0; i < MAX_RETRIES; i++) {
-      console.log(`Attempt ${i + 1} of ${MAX_RETRIES}`);
+    for (let i = 0; i < Auth.MAX_REGISTRATION_RETRIES; i++) {
+      console.log(`Attempt ${i + 1} of ${Auth.MAX_REGISTRATION_RETRIES}`);
       const username = faker.internet.username();
-      await registerPage.fillForm();
+      await registerPage.fillForm(formData);
       await registerPage.fillCredentials(username, password);
       await registerPage.submitForm();
       await page.waitForLoadState('networkidle');
