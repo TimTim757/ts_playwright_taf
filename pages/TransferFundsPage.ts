@@ -1,54 +1,38 @@
-import { Locator, Page, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
+import { createTransferFundsLocators } from './locators/transferFundsLocators';
 
 export class TransferFundsPage extends BasePage {
-    readonly transferFundsLink: Locator;
-    readonly amountInput: Locator;
-    readonly fromAccountIdSelect: Locator;
-    readonly toAccountIdSelect: Locator;
-    readonly transferButton: Locator;
-    readonly transferCompleteHeading: Locator;
-    readonly successMessage: Locator;
-
-    constructor(page: Page) {
-        super(page);
-        this.transferFundsLink = page.locator('#leftPanel').getByRole('link', { name: 'Transfer Funds' });
-        this.amountInput = page.locator('#amount');
-        this.fromAccountIdSelect = page.locator('#fromAccountId');
-        this.toAccountIdSelect = page.locator('#toAccountId');
-        this.transferButton = page.getByRole('button', { name: 'Transfer' });
-        this.transferCompleteHeading = page.getByRole('heading', { name: 'Transfer Complete!' });
-        this.successMessage = page.getByText(/has been transferred from account/);
-    }
+    protected readonly pageName = 'TransferFundsPage';
+    private readonly locators = createTransferFundsLocators(this.page);
 
     async openTransferFunds() {
-        await this.page.waitForLoadState('networkidle');
-        await this.transferFundsLink.click();
+        await this.waitForNetworkIdle();
+        await this.click(this.locators.transferFundsLink);
     }
 
     async fillTransferAmount(amount: string) {
-        await this.amountInput.fill(amount);
+        await this.fill(this.locators.amountInput, amount);
     }
 
     async selectFromAccount(fromAccount: string) {
-        await this.fromAccountIdSelect.waitFor({ state: 'visible' });
-        await this.fromAccountIdSelect.selectOption(fromAccount);
+        await this.waitForVisible(this.locators.fromAccountIdSelect);
+        await this.selectOption(this.locators.fromAccountIdSelect, fromAccount);
     }
 
     async selectToAccount(toAccount: string) {
-        await this.toAccountIdSelect.selectOption(toAccount);
+        await this.selectOption(this.locators.toAccountIdSelect, toAccount);
     }
 
     async submitForm() {
-        await this.transferButton.click();
+        await this.click(this.locators.transferButton);
     }
 
     async verifyTransferComplete() {
-        await expect(this.transferCompleteHeading).toBeVisible();
-        await expect(this.successMessage).toBeVisible();
+        await this.expectVisible(this.locators.transferCompleteHeading);
+        await this.expectVisible(this.locators.successMessage);
     }
 
     async verifyTransferMessage(message: string) {
-        await expect(this.successMessage).toContainText(message);
+        await this.expectToContainText(this.locators.successMessage, message);
     }
 }

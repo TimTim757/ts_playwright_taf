@@ -1,33 +1,24 @@
 import { test } from '../support/fixtures';
+import { Routes, AccountTypes, Amounts, Messages } from '../support/constants';
 
 test.describe('Operations', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('index.htm');
+        await page.goto(Routes.INDEX);
     });
 
-    test('Open New Bank Account', async ({ page, openNewAccountPage }) => {
-        await openNewAccountPage.goto();
-        await openNewAccountPage.selectAccountType('1');
-        await page.waitForLoadState('networkidle');
-        await openNewAccountPage.submitForm();
-        const newAccountNumber = await openNewAccountPage.getNewAccountNumber();
-        await openNewAccountPage.verifyAccountOpened(newAccountNumber);
+    test('Open New Bank Account', async ({ openNewAccountPage }) => {
+        await openNewAccountPage.openAccountWithType(AccountTypes.SAVINGS);
     });
 
     test('Transfer Funds between accounts', async ({ page, openNewAccountPage, transferFundsPage }) => {
-        await openNewAccountPage.goto();
-        await openNewAccountPage.selectAccountType('1');
-        await page.waitForLoadState('networkidle');
-        await openNewAccountPage.submitForm();
-        const newAccountNumber = await openNewAccountPage.getNewAccountNumber();
-        await openNewAccountPage.verifyAccountOpened(newAccountNumber);
+        const newAccountNumber = await openNewAccountPage.openAccountWithType(AccountTypes.SAVINGS);
 
         await transferFundsPage.openTransferFunds();
-        await transferFundsPage.fillTransferAmount('10');
+        await transferFundsPage.fillTransferAmount(Amounts.DEFAULT_TRANSFER);
         await transferFundsPage.selectFromAccount(newAccountNumber);
         await transferFundsPage.submitForm();
         await transferFundsPage.verifyTransferComplete();
-        await transferFundsPage.verifyTransferMessage('$10.00 has been transferred from account');
+        await transferFundsPage.verifyTransferMessage(Messages.TRANSFER_SUCCESS(Amounts.DEFAULT_TRANSFER));
         await page.close();
     });
 });
