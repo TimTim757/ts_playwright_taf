@@ -34,7 +34,7 @@ test.describe('Auth', () => {
       await registerPage.fillForm(formData);
       await registerPage.fillCredentials(username, password);
       await registerPage.submitForm();
-      await page.waitForLoadState('networkidle');
+      await registerPage.waitForNetworkIdle();
 
       if (await registerPage.verifyUserAlreadyExistsErrorMessage()) {
         continue;
@@ -44,6 +44,6 @@ test.describe('Auth', () => {
 
     await registerPage.verifySuccessMessage();
     await page.context().storageState({ path: AUTH_FILE });
-    await page.close();
+    await registerPage.closePage();
   });
 });
